@@ -1,1 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murder Party - Intégration ECM</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #ff7675;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            padding-bottom: 70px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), #4834d4);
+            padding: 20px;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-top: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: #3f4446;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+            font-size: 1.4rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: none;
+            background-color: #2d3436;
+            color: white;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #4834d4;
+        }
+
+        /* Système d'onglets pour la navigation basse */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1e2122;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            color: #a4b0be;
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .clue-box {
+            background-color: #2d3436;
+            padding: 15px;
+            border-left: 5px solid var(--primary);
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ALERTE : DISPARITION !</h1>
+        <p>Sandrine a disparu. Retrouvez-la avant l'audit !</p>
+        <div class="timer" id="countdown">1h 30m 00s</div>
+    </header>
+
+    <div class="container">
+        
+        <div id="page-accueil" class="page active">
+            <div class="card">
+                <h2>Le Contexte</h2>
+                <p>Sans Sandrine, l'école ne tourne plus. Les dossiers d'alternance sont bloqués et l'audit commence bientôt. Vous devez fouiller les salles et interroger l'équipe pédagogique pour découvrir qui a fait le coup, pourquoi, et où elle se cache.</p>
+            </div>
+            <div class="card">
+                <h2>Règles du jeu</h2>
+                <ul>
+                    <li>Flachez les QR codes cachés dans le bâtiment.</li>
+                    <li>Si un QR code vous donne un code secret (Ex: CODE-12), entrez-le dans l'onglet "Indices".</li>
+                    <li>Rendez votre verdict final avant la fin du chrono !</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="page-indices" class="page">
+            <div class="card">
+                <h2>Entrer un code d'indice</h2>
+                <p>Si vous avez flashé ou trouvé un code (Ex: ALBI21, PHOTO, SMS), tapez-le ci-dessous :</p>
+                <input type="text" id="clue-input" placeholder="Entrez le code ici..." style="text-transform: uppercase;">
+                <button onclick="checkClue()">Vérifier le code</button>
+                
+                <div id="clue-result" class="clue-box">
+                    </div>
+            </div>
+        </div>
+
+        <div id="page-notes" class="page">
+            <div class="card">
+                <h2>Votre Carnet de Notes</h2>
+                <p>Notez vos remarques ici au fil de l'enquête (sauvegardé automatiquement).</p>
+                <textarea id="notebook" rows="12" placeholder="Ex: Robin a l'air suspect... Alexandra évite les questions..."></textarea>
+            </div>
+        </div>
+
+        <div id="page-verdict" class="page">
+            <div class="card">
+                <h2>Rendre le Verdict</h2>
+                <p>Votre temps est presque écoulé. Accusez le coupable avec certitude.</p>
+                
+                <label for="suspect-select">Qui est le coupable ?</label>
+                <select id="suspect-select">
+                    <option value="">-- Choisir un suspect --</option>
+                    <option value="robin">Robin</option>
+                    <option value="loic">Loïc</option>
+                    <option value="laurine">Laurine</option>
+                    <option value="jules">Jules</option>
+                    <option value="andrea">Andréa</option>
+                    <option value="axelle">Axelle</option>
+                    <option value="alexandra">Alexandra</option>
+                </select>
+
+                <label for="mobile-input">Quel était le mobile (le motif) ?</label>
+                <textarea id="mobile-input" rows="4" placeholder="Pourquoi a-t-il/elle fait ça ?"></textarea>
+
+                <button onclick="submitVerdict()" style="background-color: var(--secondary);">Envoyer le verdict final</button>
+            </div>
+        </div>
+
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="switchPage('page-accueil', this)">🏠 Accueil</div>
+        <div class="nav-item" onclick="switchPage('page-indices', this)">🔍 Indices</div>
+        <div class="nav-item" onclick="switchPage('page-notes', this)">📝 Notes</div>
+        <div class="nav-item" onclick="switchPage('page-verdict', this)">⚖️ Verdict</div>
+    </nav>
+
+    <script>
+        // --- GESTION DES ONGLETS ---
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            element.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        // --- GESTION DU CHRONO (1h30) ---
+        let duration = 90 * 60; // 90 minutes en secondes 
+        const timerDisplay = document.getElementById('countdown');
+        
+        const countdownInterval = setInterval(() => {
+            let hours = Math.floor(duration / 3600);
+            let minutes = Math.floor((duration % 3600) / 60);
+            let seconds = duration % 60;
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            timerDisplay.textContent = `${hours}h ${minutes}m ${seconds}s`;
+
+            if (--duration < 0) {
+                clearInterval(countdownInterval);
+                timerDisplay.textContent = "TEMPS ÉCOULÉ !";
+                alert("Le temps est écoulé ! Rendez-vous en amphi pour la résolution.");
+            }
+        }, 1000);
+
+        // --- BASE DE DONNÉES DES CODES INDICES ---
+        // Quand les étudiants flashent un QR Code, ils tombent sur un mot-clé à rentrer ici
+        const clueDatabase = {
+            "ALBI21": "<strong>Indice - Bureau de Sandrine :</strong> Vous trouvez une tasse renversée et ce nom de code griffonné : AlBi-21[cite: 24]. C'est étrange, cela ressemble au code de l'audit d'Alexandra...",
+            "SMS": "<strong>Indice - Ascenseur :</strong> Un téléphone trouvé affiche une dispute par SMS entre Sandrine et Andréa. Andréa dit : 'Je cherche juste la clé de la salle 15, Alexandra me met la pression !' [cite: 22]",
+            "PHOTO": "<strong>Indice - Photocopieuse :</strong> Le copieur a bourré. En ouvrant, vous trouvez une photocopie de la main de Sandrine avec écrit 'AIDEZ-MOI'.",
+            "CADAVRE": "Mdr non, personne n'est mort, Sandrine a juste disparu. Continuez de chercher !",
+            "CAFE": "<strong>Indice - Salle de repos :</strong> 7 tasses sont sur la table[cite: 28]. L'une d'elles a des traces de rouge à lèvres rouge vif[cite: 29]. Alexandra porte ce rouge à lèvres aujourd'hui..."
+        };
+
+        function checkClue() {
+            const input = document.getElementById('clue-input').value.trim().toUpperCase();
+            const resultBox = document.getElementById('clue-result');
+            
+            resultBox.style.display = "block";
+            if (clueDatabase[input]) {
+                resultBox.innerHTML = clueDatabase[input];
+                resultBox.style.borderLeftColor = "var(--primary)";
+            } else {
+                resultBox.innerHTML = "❌ Code invalide ou fausse piste ! Regardez bien autour de vous.";
+                resultBox.style.borderLeftColor = "var(--secondary)";
+            }
+        }
+
+        // --- SAUVEGARDE DU CARNET DE NOTES LOCALEMENT ---
+        const notebook = document.getElementById('notebook');
+        notebook.value = localStorage.getItem('murder_party_notes') || "";
+        notebook.addEventListener('input', () => {
+            localStorage.setItem('murder_party_notes', notebook.value);
+        });
+
+        // --- SOUMISSION DU VERDICT ---
+        function submitVerdict() {
+            const suspect = document.getElementById('suspect-select').value;
+            const mobile = document.getElementById('mobile-input').value.trim();
+
+            if (!suspect || !mobile) {
+                alert("Veuillez sélectionner un coupable et expliquer son mobile !");
+                return;
+            }
+
+            alert("Verdict enregistré avec succès ! Votre équipe a soumis ses conclusions. Préparez-vous pour la Color Run[cite: 13]!");
+            console.log("Verdict soumis : ", { suspect, mobile });
+        }
+    </script>
+</body>
+</html>
