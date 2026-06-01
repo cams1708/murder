@@ -322,7 +322,8 @@
                 <button onclick="submitVerdict()" style="background: linear-gradient(135deg, var(--accent) 0%, #ff6b81 100%); box-shadow: 0 4px 15px var(--accent-glow);">Soumettre le Rapport Final</button>
             </div>
         </div>
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(window.submitted) { alert('🚨 RAPPORT TRANSMIS ! Les données de votre équipe ont été figées et envoyées au QG. Vous pouvez vous diriger vers le point de rassemblement pour la Color Run !'); document.querySelector('#page-verdict button').disabled = true; document.querySelector('#page-verdict button').innerText = 'Rapport envoyé ✔'; }"></iframe>
+
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(window.submitted) { alert('🚨 RAPPORT TRANSMIS ! Les données de votre équipe ont été figées et envoyées au QG. Vous pouvez vous diriger vers le point de rassemblement pour la Color Run !'); document.querySelector(\'#page-verdict button\').disabled = true; document.querySelector(\'#page-verdict button\').innerText = \'Rapport envoyé ✔\'; }"></iframe>
     </div>
 
     <nav class="nav-bar">
@@ -409,54 +410,47 @@
         });
 
         // --- SOUMISSION INVISIBLE VERS GOOGLE SHEETS ---
+        style="background: linear-gradient(135deg, var(--accent) 0%, #ff6b81 100%); box-shadow: 0 4px 15px var(--accent-glow);"
         function submitVerdict() {
-    // 1. Récupération des valeurs des champs
-    const teamName = document.getElementById('team-name') ? document.getElementById('team-name').value.trim() : "Équipe Inconnue";
-    const suspect = document.getElementById('suspect-select').value;
-    const mobile = document.getElementById('mobile-input').value.trim();
+            const teamName = document.getElementById('team-name') ? document.getElementById('team-name').value.trim() : "Équipe Inconnue";
+            const suspect = document.getElementById('suspect-select').value;
+            const mobile = document.getElementById('mobile-input').value.trim();
 
-    // 2. Validation des champs
-    if (!suspect || !mobile || !teamName) {
-        alert("⚠️ Erreur : Votre rapport d'enquête est incomplet. Assurez-vous d'avoir entré votre nom d'équipe, le coupable et le mobile.");
-        return;
-    }
+            if (!suspect || !mobile || !teamName) {
+                alert("⚠️ Erreur : Votre rapport d'enquête est incomplet. Assurez-vous d'avoir entré votre nom d'équipe, le coupable et le mobile.");
+                return;
+            }
 
-    // 3. URL de soumission Google Form
-    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfjRYIu7r41f-3s3teD0rjNTYZEaNh4Aa3anWEk_6Nw0koXMQ/formResponse"; 
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfjRYIu7r41f-3s3teD0rjNTYZEaNh4Aa3anWEk_6Nw0koXMQ/formResponse"; 
 
-    // 4. Formatage URL-encoded (Infaillible pour Google Forms)
-    const searchParams = new URLSearchParams();
-    searchParams.append("entry.1704055750", teamName);
-    searchParams.append("entry.350580508", suspect);
-    searchParams.append("entry.1477887052", mobile);
+            const searchParams = new URLSearchParams();
+            searchParams.append("entry.1704055750", teamName);
+            searchParams.append("entry.350580508", suspect);
+            searchParams.append("entry.1477887052", mobile);
 
-    // 5. Envoi de la requête en tâche de fond
-    fetch(formUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: searchParams.toString()
-    })
-    .then(() => {
-        // Succès de l'envoi invisible
-        alert("🚨 RAPPORT TRANSMIS ! Les données de votre équipe ont été figées et envoyées au QG. Vous pouvez vous diriger vers le point de rassemblement pour la Color Run !");
-        
-        // Verrouillage du bouton pour éviter les doublons
-        const submitBtn = document.querySelector("#page-verdict button");
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.style.background = "#2f3542";
-            submitBtn.innerText = "Rapport envoyé ✔";
+            fetch(formUrl, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: searchParams.toString()
+            })
+            .then(() => {
+                alert("🚨 RAPPORT TRANSMIS ! Les données de votre équipe ont été figées et envoyées au QG. Vous pouvez vous diriger vers le point de rassemblement pour la Color Run !");
+                
+                const submitBtn = document.querySelector("#page-verdict button");
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.background = "#2f3542";
+                    submitBtn.innerText = "Rapport envoyé ✔";
+                }
+            })
+            .catch((error) => {
+                console.error("Erreur d'envoi :", error);
+                alert("❌ Erreur réseau lors de la transmission. Vérifiez votre connexion 4G/Wi-Fi et réessayez.");
+            });
         }
-    })
-    .catch((error) => {
-        console.error("Erreur d'envoi :", error);
-        alert("❌ Erreur réseau lors de la transmission. Vérifiez votre connexion 4G/Wi-Fi et réessayez.");
-    });
-}
-        
     </script>
 </body>
 </html>
