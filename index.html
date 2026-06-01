@@ -300,7 +300,8 @@
             <div class="card">
                 <h2> Clôture de l'Enquête</h2>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">Analysez bien vos preuves avant d'envoyer votre rapport. Vous ne pouvez soumettre qu'un seul verdict.</p>
-                
+                <label for="team-name">Nom de votre équipe (ex: Couleur ou Numéro)</label>
+                <input type="text" id="team-name" placeholder="Entrez le nom officiel de votre groupe...">
                 <label for="suspect-select">Désigner le suspect principal</label>
                 <select id="suspect-select">
                     <option value="">-- Sélectionner le coupable --</option>
@@ -341,80 +342,109 @@
         </div>
     </nav>
 
-    <script>
-        function switchPage(pageId, element) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            
-            document.getElementById(pageId).classList.add('active');
-            element.classList.add('active');
-            window.scrollTo(0,0);
-        }
+    function switchPage(pageId, element) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    
+    document.getElementById(pageId).classList.add('active');
+    element.classList.add('active');
+    window.scrollTo(0,0);
+}
 
-        // Chrono formaté HH:MM:SS
-        let duration = 90 * 60;
-        const timerDisplay = document.getElementById('countdown');
-        
-        const countdownInterval = setInterval(() => {
-            let hours = Math.floor(duration / 3600);
-            let minutes = Math.floor((duration % 3600) / 60);
-            let seconds = duration % 60;
+// --- CHRONO ---
+let duration = 90 * 60; // 90 minutes
+const timerDisplay = document.getElementById('countdown');
 
-            hours = hours < 10 ? "0" + hours : hours;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
+const countdownInterval = setInterval(() => {
+    let hours = Math.floor(duration / 3600);
+    let minutes = Math.floor((duration % 3600) / 60);
+    let seconds = duration % 60;
 
-            timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
 
-            if (--duration < 0) {
-                clearInterval(countdownInterval);
-                timerDisplay.textContent = "00:00:00";
-                alert("🚨 Le temps réglementaire est écoulé ! Soumettez immédiatement vos rapports.");
-            }
-        }, 1000);
+    timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
 
-        const clueDatabase = {
-            "ALBI21": "⚠️ <strong>ÉLÉMENT NUMÉRO #ALBI21 :</strong><br>Découvert sur le bureau de Sandrine sous une tasse renversée. Après vérification dans les registres système, il s'agit du code d'accès de l'audit interne géré par Alexandra...",
-            "SMS": "📱 <strong>CORRESPONDANCE CHIPHÉE (Ascenseur) :</strong><br>Extraction des derniers messages entre Sandrine et Andréa. Le ton monte. Andréa écrit : 'Je cherche juste la clé de la salle 15, Alexandra me met une pression d'enfer pour que je la trouve !'",
-            "PHOTO": "📠 <strong>RAPPORT TECHNIQUES (Salle Photocopieuse) :</strong><br>Bourrage tambour constaté. En extrayant le papier bloqué, vous découvrez le scan thermique de la main de Sandrine avec l'inscription manuscrite : 'AIDEZ-MOI'.",
-            "CADAVRE": "👀 <strong>FAUSSE PISTE :</strong><br>Rien à voir ici. Concentrez-vous sur les indices matériels plutôt que de chercher des fantômes.",
-            "CAFE": "☕ <strong>ANALYSE DE SURFACE (Salle de repos) :</strong><br>Sur les 7 tasses à café abandonnées, l'une présente un dépôt de rouge à lèvres écarlate. Un coup d'œil rapide à l'équipe montre qu'Alexandra porte exactement cette teinte aujourd'hui..."
-        };
+    if (--duration < 0) {
+        clearInterval(countdownInterval);
+        timerDisplay.textContent = "00:00:00";
+        alert("🚨 Le temps réglementaire est écoulé ! Soumettez immédiatement vos rapports.");
+    }
+}, 1000);
 
-        function checkClue() {
-            const input = document.getElementById('clue-input').value.trim().toUpperCase();
-            const resultBox = document.getElementById('clue-result');
-            
-            resultBox.style.display = "block";
-            if (clueDatabase[input]) {
-                resultBox.innerHTML = clueDatabase[input];
-                resultBox.style.borderLeftColor = "var(--primary)";
-                resultBox.style.background = "rgba(140, 122, 230, 0.1)";
-            } else {
-                resultBox.innerHTML = "❌ <strong>CODE INCONNU :</strong> Cet élément n'est pas répertorié ou est une fausse piste humoristique. Continuez d'explorer le bâtiment.";
-                resultBox.style.borderLeftColor = "var(--accent)";
-                resultBox.style.background = "rgba(255, 71, 87, 0.1)";
-            }
-        }
+// --- BASE DE DONNÉES DES CODES INDICES ---
+const clueDatabase = {
+    "ALBI21": "⚠️ <strong>ÉLÉMENT NUMÉRO #ALBI21 :</strong><br>Découvert sur le bureau de Sandrine sous une tasse renversée. Après vérification dans les registres système, il s'agit du code d'accès de l'audit interne géré par Alexandra...",
+    "SMS": "📱 <strong>CORRESPONDANCE CHIFFRÉE (Ascenseur) :</strong><br>Extraction des derniers messages entre Sandrine et Andréa. Le ton monte. Andréa écrit : 'Je cherche juste la clé de la salle 15, Alexandra me met une pression d'enfer pour que je la trouve !'",
+    "PHOTO": "📠 <strong>RAPPORT TECHNIQUE (Salle Photocopieuse) :</strong><br>Bourrage tambour constaté. En extrayant le papier bloqué, vous découvrez le scan thermique de la main de Sandrine avec l'inscription manuscrite : 'AIDEZ-MOI'.",
+    "CADAVRE": "👀 <strong>FAUSSE PISTE :</strong><br>Rien à voir ici. Concentrez-vous sur les indices matériels plutôt que de chercher des fantômes.",
+    "CAFE": "☕ <strong>ANALYSE DE SURFACE (Salle de repos) :</strong><br>Sur les 7 tasses à café abandonnées, l'une présente un dépôt de rouge à lèvres écarlate. Un coup d'œil rapide à l'équipe montre qu'Alexandra porte exactement cette teinte aujourd'hui..."
+};
 
-        const notebook = document.getElementById('notebook');
-        notebook.value = localStorage.getItem('murder_party_notes') || "";
-        notebook.addEventListener('input', () => {
-            localStorage.setItem('murder_party_notes', notebook.value);
-        });
+function checkClue() {
+    const input = document.getElementById('clue-input').value.trim().toUpperCase();
+    const resultBox = document.getElementById('clue-result');
+    
+    resultBox.style.display = "block";
+    if (clueDatabase[input]) {
+        resultBox.innerHTML = clueDatabase[input];
+        resultBox.style.borderLeftColor = "var(--primary)";
+        resultBox.style.background = "rgba(140, 122, 230, 0.1)";
+    } else {
+        resultBox.innerHTML = "❌ <strong>CODE INCONNU :</strong> Cet élément n'est pas répertorié ou est une fausse piste humoristique. Continuez d'explorer le bâtiment.";
+        resultBox.style.borderLeftColor = "var(--accent)";
+        resultBox.style.background = "rgba(255, 71, 87, 0.1)";
+    }
+}
 
-        function submitVerdict() {
-            const suspect = document.getElementById('suspect-select').value;
-            const mobile = document.getElementById('mobile-input').value.trim();
+// --- SAUVEGARDE DU CARNET DE NOTES ---
+const notebook = document.getElementById('notebook');
+notebook.value = localStorage.getItem('murder_party_notes') || "";
+notebook.addEventListener('input', () => {
+    localStorage.setItem('murder_party_notes', notebook.value);
+});
 
-            if (!suspect || !mobile) {
-                alert("⚠️ Erreur : Votre rapport d'enquête est incomplet. Veuillez désigner un coupable et motiver son mobile.");
-                return;
-            }
+// --- SOUMISSION INVISIBLE VERS GOOGLE SHEETS ---
+function submitVerdict() {
+    // Récupération des valeurs des champs
+    const teamName = document.getElementById('team-name') ? document.getElementById('team-name').value.trim() : "Équipe Inconnue";
+    const suspect = document.getElementById('suspect-select').value;
+    const mobile = document.getElementById('mobile-input').value.trim();
 
-            alert("🚨 RAPPORT ENVOYÉ : Les données de votre équipe ont été verrouillées et transmises à l'administration. Préparez-vous pour le rassemblement général avant la Color Run !");
-            console.log("Verdict soumis : ", { suspect, mobile });
-        }
-    </script>
+    // Validation
+    if (!suspect || !mobile || (document.getElementById('team-name') && !teamName)) {
+        alert("⚠️ Erreur : Votre rapport d'enquête est incomplet. Assurez-vous d'avoir entré votre nom d'équipe, le coupable et le mobile.");
+        return;
+    }
+
+    // -------------------------------------------------------------
+    // CONFIGURATION GOOGLE FORM (À MODIFIER AVEC TES INFOS)
+    // -------------------------------------------------------------
+    const formUrl = "https://docs.google.com/forms/d/e/TON_ID_DE_FORMULAIRE/formResponse"; 
+    
+    const formData = new FormData();
+    formData.append("entry.111111111", teamName); // Remplace par l'ID de la question "Nom de l'équipe"
+    formData.append("entry.222222222", suspect);  // Remplace par l'ID de la question "Coupable"
+    formData.append("entry.333333333", mobile);   // Remplace par l'ID de la question "Mobile"
+    // -------------------------------------------------------------
+
+    // Envoi de la requête en tâche de fond
+    fetch(formUrl, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+    })
+    .then(() => {
+        alert("🚨 RAPPORT TRANSMIS ! Les données de votre équipe ont été figées et envoyées au QG. Vous pouvez vous diriger vers le point de rassemblement pour la Color Run !");
+        // Désactiver le bouton pour éviter les doubles envois
+        document.querySelector("#page-verdict button").disabled = true;
+        document.querySelector("#page-verdict button").innerText = "Rapport envoyé ✔";
+    })
+    .catch((error) => {
+        console.error("Erreur d'envoi :", error);
+        alert("❌ Erreur réseau lors de la transmission. Vérifiez votre connexion 4G/Wi-Fi et réessayez.");
+    });
+}
 </body>
 </html>
