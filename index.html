@@ -419,14 +419,14 @@ function submitVerdict() {
     }
 
     // -------------------------------------------------------------
-    // CONFIGURATION GOOGLE FORM (À MODIFIER AVEC TES INFOS)
+    // CONFIGURATION GOOGLE FORM 
     // -------------------------------------------------------------
-    const formUrl = "https://docs.google.com/forms/d/e/TON_ID_DE_FORMULAIRE/formResponse"; 
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfjRYIu7r41f-3s3teD0rjNTYZEaNh4Aa3anWEk_6Nw0koXMQ/formResponse"; 
     
     const formData = new FormData();
-    formData.append("entry.111111111", teamName); // Remplace par l'ID de la question "Nom de l'équipe"
-    formData.append("entry.222222222", suspect);  // Remplace par l'ID de la question "Coupable"
-    formData.append("entry.333333333", mobile);   // Remplace par l'ID de la question "Mobile"
+    formData.append("entry.1704055750", teamName); 
+    formData.append("entry.350580508", suspect);  
+    formData.append("entry.1477887052", mobile);   
     // -------------------------------------------------------------
 
     // Envoi de la requête en tâche de fond
